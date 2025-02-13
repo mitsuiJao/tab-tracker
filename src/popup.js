@@ -37,11 +37,8 @@ function urlFromDomain(data, domain) {
 
 function getAgo(time) {
     let posted = new Date(time);
-
     let diff = new Date().getTime() - posted.getTime();
-
     let progress = new Date(diff);
-
     let ago;
 
     if (progress.getUTCFullYear() - 1970) {
@@ -148,13 +145,13 @@ function getProtocol(fqdn) {
 }
 
 
-function domainclicked(){
+function domainclicked() {
     console.log(this.innerText);
     let redirect = here + "?query=" + this.innerText;
     window.location.href = redirect;
 }
 
-function urlclicked(e){
+function urlclicked(e) {
     console.log(e);
     let redirect = "http://" + this.domain + e.currentTarget.innerText;
     console.log(redirect);
@@ -163,11 +160,11 @@ function urlclicked(e){
 
 
 // main
-if (query == null){ // domain
+if (query == null) { // domain
     chrome.storage.local.get(null, function (data) {
         HTMLbuilder(data);
         let tblElem = document.getElementById("mytable");
-        for (let i=0; i<tblElem.rows.length; i++) {
+        for (let i = 0; i < tblElem.rows.length; i++) {
             tblElem.rows[i].cells[1].addEventListener("click", domainclicked);
         }
     });
@@ -175,7 +172,7 @@ if (query == null){ // domain
     chrome.storage.local.get(null, function (data) {
         HTMLbuilder(data, query);
         let url = urlFromDomain(data, query);
-        
+
         let back = document.getElementById("back");
         back.addEventListener("click", () => {
             let redirect = loot;
@@ -185,8 +182,8 @@ if (query == null){ // domain
         let tblElem = document.getElementById("mytable");
         let domain = document.getElementById("domain").innerText;
         console.log(domain);
-        for (let i=1; i<tblElem.rows.length; i++) {
-            tblElem.rows[i].cells[1].addEventListener("click", {domain: domain, handleEvent: urlclicked});
+        for (let i = 1; i < tblElem.rows.length; i++) {
+            tblElem.rows[i].cells[1].addEventListener("click", { domain: domain, handleEvent: urlclicked });
         }
     });
 }
