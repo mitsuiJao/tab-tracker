@@ -4,6 +4,7 @@ class TabTimer {
         this.recent;
         this.active;
         this.activetime;
+        this.__RESET();
         this.storageRead();
     }
 
@@ -21,12 +22,21 @@ class TabTimer {
     storageRead() {
         chrome.storage.local.get(null, function (data) {
             this.container = data;
-            console.log(this.container)
+            console.log(this.container);
         });
     }
 
     __RESET() {
         chrome.storage.local.clear();
+        this.__INIT();
+    }
+
+    __INIT(){
+        const template = {
+            URL: [],
+            DOMAIN: []
+        }
+        chrome.storage.local.set(template);
     }
 }
 
@@ -65,7 +75,7 @@ async function getTabInfo() { //  awaitはpromiseのresolveを待ち、その値
 const t = new TabTimer();
 
 chrome.tabs.onActivated.addListener(async (activeInfo) => {
-    t.load(await getTabInfo());
+    // t.load(await getTabInfo());
 });
 
 chrome.windows.onFocusChanged.addListener(async function (windowId) {
