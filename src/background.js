@@ -16,10 +16,6 @@ class TabTimer {
         } catch (error) {
             return;
         }
-
-        chrome.storage.local.set({ url: forcusurl });
-        this.storageRead();
-        this.__RESET();
     }
 
     storageRead() {
