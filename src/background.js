@@ -32,7 +32,7 @@ class TabTimer {
         data.forEach(element => {
             if (element.active) {
                 element.active = false;
-
+                seconds += Date.now() - 
             }
         });
     }
