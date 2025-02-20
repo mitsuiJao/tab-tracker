@@ -1,42 +1,51 @@
 class TabTimer {
     constructor() {
-        this.n = 0;
-        this.recent;
-        this.active;
-        this.activetime;
-        this.__RESET();
         this.storageRead();
     }
 
     load(tabinfo) {
-        let forcusurl = tabinfo.url;
-        let forcustitle = tabinfo.title;
-        let forcusicon = tabinfo.icon;
+        let f_url = tabinfo.url;
+        let f_title = tabinfo.title;
+        let f_icon = tabinfo.icon;
+        let f_domain = this.getDomain(f_url);
         try {
-            new URL(forcusurl);
+            new URL(f_url);
         } catch (error) {
             return;
         }
+
+
+
+        this.storageRead();
+        let index = container.index;
+        let data = container.data;
+        if (index.find(f_domain) == f_domain || index.find(f_url)) {
+
+        } else {
+
+        }
+    }
+
+    update() {
+        this.storageRead();
+        let data = this.container.data
+        data.forEach(element => {
+            if (element.active) {
+                element.active = false;
+
+            }
+        });
     }
 
     storageRead() {
         chrome.storage.local.get(null, function (data) {
             this.container = data;
-            console.log(this.container);
+            console.log(this.container)
         });
     }
 
     __RESET() {
         chrome.storage.local.clear();
-        this.__INIT();
-    }
-
-    __INIT(){
-        const template = {
-            URL: [],
-            DOMAIN: []
-        }
-        chrome.storage.local.set(template);
     }
 }
 
@@ -75,7 +84,7 @@ async function getTabInfo() { //  awaitはpromiseのresolveを待ち、その値
 const t = new TabTimer();
 
 chrome.tabs.onActivated.addListener(async (activeInfo) => {
-    // t.load(await getTabInfo());
+    t.load(await getTabInfo());
 });
 
 chrome.windows.onFocusChanged.addListener(async function (windowId) {
@@ -83,3 +92,25 @@ chrome.windows.onFocusChanged.addListener(async function (windowId) {
 
 chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
 });
+
+/*
+data = [
+    {
+    active: bool,
+    domain: string,
+    icon: string,
+    seconds: int,
+    time: int
+    url: [{
+        active: bool,
+        title: string,
+        url: string,
+        seconds: int,
+        time: int
+    }]
+}]    
+
+index = [
+    url, domainごっちゃ
+]
+*/
