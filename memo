@@ -1,9 +1,34 @@
 background.js
 タブが更新される
 情報を取得
-更新され始めた時間、タイトル、urlを保存
-更新され始めた時間、ドメインを保存
+storageを取得
+もしリンクに訪れたことがないなら
+    アクティブにして時刻、タイトル、url、を保存
+    同上 時刻、ドメインを保存
+あるなら
+    アクティブにして時刻を更新
+
 
 popup.js
 保存を読み取る
 時間はこっちで処理
+
+
+[{
+    active: bool,
+    domain: string,
+    icon: string,
+    seconds: int,
+    time: int
+    url: [{
+        active: bool,
+        title: string,
+        url: string,
+        seconds: int,
+        time: int
+    }]
+}]    
+
+index = [
+    url, domainごっちゃ
+]

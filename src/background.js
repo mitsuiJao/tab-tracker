@@ -1,6 +1,6 @@
 class TabTimer {
     constructor() {
-        this.storageRead();
+        this.container;
     }
 
     load(tabinfo) {
@@ -14,26 +14,83 @@ class TabTimer {
             return;
         }
 
-
-
         this.storageRead();
         let index = container.index;
         let data = container.data;
         if (index.find(f_domain) == f_domain || index.find(f_url)) {
-
+            this.refresh();
+            this.start(f_domain, f_url);
         } else {
-
+            this.refresh();
+            this.add(f_domain, f_url, f_title, f_icon);
+            this.start(f_domain, f_url);
         }
     }
 
-    update() {
-        this.storageRead();
+    refresh() {
         let data = this.container.data
         data.forEach(element => {
             if (element.active) {
                 element.active = false;
-                seconds += Date.now() - 
+                element.seconds += Date.now() - element.time;
             }
+            element.url.forEach(element2 => {
+                if (element2.active) {
+                    element2.active = false;
+                    element2.seconds += Date.now() - element.time;
+                }
+            });
+        });
+    }
+
+    add(domain, url, title, icon) {
+        let data = this.container.data;
+        let index = this.container.index;
+        data.forEach(element => {
+            if (element.domain == domain) {
+                element.url.push({
+                    active: false,
+                    title: title,
+                    url: url,
+                    seconds: 0,
+                    time: 0
+                });
+                index.push(url);
+                return;
+            }
+        });
+
+        element.push({
+            active: false,
+            domain: domain,
+            icon: icon,
+            seconds: 0,
+            time: 0,
+            url: [{
+                active: false,
+                title: title,
+                url: url,
+                seconds: 0,
+                time: 0
+            }]
+        });
+        index.push(domain);
+        index.push(url);
+    }
+
+    start(domain, url) {
+        let data = this.container.data;
+        data.forEach(element => {
+            if (element.domain == domain) {
+                element.active = true;
+                element.time = Date.now();
+            }
+            element.url.forEach(element2 => {
+                if (element2.url == url) {
+                    element2.active = true;
+                    element2.time = Date.now();
+                }
+            });
         });
     }
 
@@ -92,25 +149,3 @@ chrome.windows.onFocusChanged.addListener(async function (windowId) {
 
 chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
 });
-
-/*
-data = [
-    {
-    active: bool,
-    domain: string,
-    icon: string,
-    seconds: int,
-    time: int
-    url: [{
-        active: bool,
-        title: string,
-        url: string,
-        seconds: int,
-        time: int
-    }]
-}]    
-
-index = [
-    url, domainごっちゃ
-]
-*/
