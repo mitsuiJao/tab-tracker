@@ -1,5 +1,6 @@
 class TabTimer {
     constructor() {
+        this.__RESET();
         this.container;
     }
 
@@ -7,7 +8,7 @@ class TabTimer {
         let f_url = tabinfo.url;
         let f_title = tabinfo.title;
         let f_icon = tabinfo.icon;
-        let f_domain = this.getDomain(f_url);
+        let f_domain = getDomain(f_url);
         try {
             new URL(f_url);
         } catch (error) {
@@ -15,20 +16,28 @@ class TabTimer {
         }
 
         this.storageRead();
-        let index = container.index;
-        let data = container.data;
-        if (index.find(f_domain) == f_domain || index.find(f_url)) {
-            this.refresh();
-            this.start(f_domain, f_url);
+        console.log(this.container);
+
+        if (this.container !== undefined) {
+            let index = this.container.index;
+            if (index.includes(f_domain) || index.includes(f_url)) {
+                this.refresh();
+                this.start(f_domain, f_url);
+
+            } else {
+                this.refresh();
+                this.add(f_domain, f_url, f_title, f_icon);
+                this.start(f_domain, f_url);
+            }
+            write({ data: this.container });
         } else {
-            this.refresh();
-            this.add(f_domain, f_url, f_title, f_icon);
+            this.initAdd(f_domain, f_url, f_title, f_icon);
             this.start(f_domain, f_url);
         }
     }
 
     refresh() {
-        let data = this.container.data
+        let data = this.container.data;
         data.forEach(element => {
             if (element.active) {
                 element.active = false;
@@ -59,8 +68,7 @@ class TabTimer {
                 return;
             }
         });
-
-        element.push({
+        data.push({
             active: false,
             domain: domain,
             icon: icon,
@@ -74,11 +82,34 @@ class TabTimer {
                 time: 0
             }]
         });
+
         index.push(domain);
         index.push(url);
     }
 
+    initAdd(domain, url, title, icon) {
+        let obj = {
+            data: [{
+                active: false,
+                domain: domain,
+                icon: icon,
+                seconds: 0,
+                time: 0,
+                url: [{
+                    active: false,
+                    title: title,
+                    url: url,
+                    seconds: 0,
+                    time: 0
+                }]
+            }],
+            index: [domain, url]
+        }
+        this.container = obj;
+    }
+
     start(domain, url) {
+        console.log(this.container)
         let data = this.container.data;
         data.forEach(element => {
             if (element.domain == domain) {
@@ -92,12 +123,13 @@ class TabTimer {
                 }
             });
         });
+        write(data)
     }
 
     storageRead() {
         chrome.storage.local.get(null, function (data) {
             this.container = data;
-            console.log(this.container)
+            console.log(data);
         });
     }
 
@@ -107,11 +139,12 @@ class TabTimer {
 }
 
 const write = (data) => {
-    chrome.storage.local.set(data);
+    chrome.storage.local.set({ data: data });
 };
 
-const getDomain = (URL) => {
-    let domain = new URL(URL).hostname;
+const getDomain = (url) => {
+    let domain = new URL(url)
+    domain = domain.hostname;
     if (domain.startsWith("www.")) {
         domain = domain.slice(4);
     }
